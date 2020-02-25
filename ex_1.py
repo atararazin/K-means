@@ -103,7 +103,7 @@ for iter in range(0,NUM_ITERATIONS):
     for j in range(0, len(newCents)):
     #for j in newCents.values():
         newCents[j] = []
-        #j = []
+        #j = []k
 
     '''
     for i in x:
