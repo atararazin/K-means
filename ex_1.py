@@ -47,7 +47,10 @@ def sumPoints(list):
         return
     n = len(list)
     listX, listY = zip(*list)
-    return (sum(listX) / n, sum(listY) / n)
+    newX = (sum(listX) / n).round()
+    newY = (sum(listY) / n).round()
+    #return (sum(listX) / n, sum(listY) / n)
+    return newX, newY
 
 prevStr = ""
 
@@ -55,37 +58,26 @@ newCents = {k: [] for k in range(len(centrioads))}
 
 total_loss = []
 
-for iter in range(0,NUM_ITERATIONS):
+for iter in range(0, NUM_ITERATIONS):
     iter_loss = 0
     for i in x:
-        #min_dis =  float("inf")
-        closest = centrioads[0]
-        index = 0
-        min_dis = calc_euclid_dist(i,closest)
-        curr = 0
-        for j in centrioads[1:centrioads.shape[0]]:
-        #curr = 0
-        #index = 0
-        #for j in centrioads:
-            curr = curr + 1
-            dist = calc_euclid_dist(i, j)
-            if(min_dis > dist):
-                min_dis = dist
-                closest = j
-                index = curr
+        dists = []
+        for cent in centrioads:
+            dists.append(calc_euclid_dist(i,cent))
+
+        min_dist = min(dists)
+        index = dists.index(min_dist)
         newCents.get(index).append(i)
-        iter_loss += min_dis
+        iter_loss += min_dist
     print("iteration:", iter)
-    print("loss:", iter_loss / len(x))
+    print("loss:", iter_loss / len(x), "\n")
     total_loss.append((iter, iter_loss / len(x)))
 
     for i, vals in enumerate(newCents.values()):
-        c = sumPoints(vals)
-        centrioads[i] = c
-        centrioads[i] = centrioads[i].round()
+        centrioads[i] = sumPoints(vals)
+
 
     #write to file
-
     file.write("[iter " + str(iter) + "]:")
     s = ""
     for i in centrioads:
@@ -100,10 +92,8 @@ for iter in range(0,NUM_ITERATIONS):
     prevStr = s
     #done
 
-    for j in range(0, len(newCents)):
-    #for j in newCents.values():
-        newCents[j] = []
-        #j = []k
+    for l in newCents.values():
+        del l[:]
 
     '''
     for i in x:
@@ -114,9 +104,14 @@ for iter in range(0,NUM_ITERATIONS):
     plt.show()
 '''
 
-res = [[ i for i, j in total_loss ],
-       [ j for i, j in total_loss ]]
-plt.plot(res[0],res[1])
+x,y = zip(*total_loss)
+#res = [[ i for i, j in total_loss ],
+#       [ j for i, j in total_loss ]]
+#plt.plot(res[0],res[1])
+plt.title("Loss Graph:")
+plt.xlabel("Iteration")
+plt.ylabel("Loss")
+plt.plot(x,y)
 plt.show()
 
 file.close()
